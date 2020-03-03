@@ -1,0 +1,17 @@
+{
+  "role": "CloudScanRole",
+
+  "accounts":[
+    "account1",
+    "account2"
+  ],
+
+  "regions":[
+    "us-west-2",
+    "us-west-1",
+    "us-east-1",
+    "us-east-2"
+  ],
+
+  "routingkey":"someroutingkey"
+}
