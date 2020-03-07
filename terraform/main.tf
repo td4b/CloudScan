@@ -1,68 +1,77 @@
+// IAM Polcies needed for Cloudscan to function.
 
-## Account Specific Config
-## This config is only aplied to the EC2 instance running cloudscan.
-## Notice that the policy sets the trust relationship for cross account access.
-## These would need to be modified to reflect your accountID.
-
-# Instance Role that allows the Assume Role to happen.
-# Attached directly to EC2 instance as an Instance profile.
-resource "aws_iam_role" "CloudScanIntanceRole" {
-  name = "CloudScanIntanceRole"
+// IAM Instance Role
+resource "aws_iam_role" "CloudScanInstanceRole" {
+  name = "CloudScanInstanceRole"
 
   assume_role_policy = <<EOF
-  {
+{
+      "Version": "2012-10-17",
+      "Statement": [
+          {
+              "Sid": "",
+              "Effect": "Allow",
+              "Principal": {
+                  "Service": "ec2.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+          }
+      ]
+}
+EOF
+}
+  
+resource "aws_iam_role_policy_attachment" "attachinstance" {
+  role       = aws_iam_role.CloudScanInstanceRole.name
+  policy_arn = aws_iam_policy.CloudscanInstancePolicy.arn
+}
+
+resource "aws_iam_policy" "CloudscanInstancePolicy" {
+  name        = "CloudscanInstancePolicy"
+  path        = "/"
+  description = "CloudScan Instance Policy for Operations."
+
+  policy = <<EOF
+{
       "Version": "2012-10-17",
       "Statement": [
           {
               "Effect": "Allow",
               "Action": "sts:AssumeRole",
               "Resource": [
-                  "arn:aws:iam::11111111:role/CloudScanRole",
-                  "arn:aws:iam::22222222:role/CloudScanRole"
+                  "arn:aws:iam::11111111111:role/CloudScanRole",
+                  "arn:aws:iam::11111111111:role/CloudScanInstanceRole"
               ]
           }
       ]
-  }
+}
 EOF
 }
 
-## Deploy to all Accounts.
-## This config is applied to all Accounts so that the role is provisioned in each account.
-## Note the trust relationsip here is set back to the InstanceProfile set above.
-
-## Please note: Even after the creation of these you will
-
-# Role defined in the Account that provides cloudscan permissions to audit.
+// Role defined in the Account that provides cloudscan permissions to audit.
 resource "aws_iam_role" "CloudScanRole" {
   name = "CloudScanRole"
 
   assume_role_policy = <<EOF
 {
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "ec2.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
-    },
-    {
-        "Effect": "Allow",
-        "Action": "sts:AssumeRole",
-        "Resource": [
-            "arn:aws:iam::11111111:role/CloudScanIntanceRole"
-        ]
-    }
-  ]
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "",
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::11111111111:role/CloudScanInstanceRole"
+            },
+            "Action": "sts:AssumeRole"
+        }
+    ]
 }
 EOF
 }
 
 resource "aws_iam_role_policy_attachment" "attach" {
-  role       = "${aws_iam_role.CloudScanRole.name}"
-  policy_arn = "${aws_iam_policy.cloudscan.arn}"
+  role       = aws_iam_role.CloudScanRole.name
+  policy_arn = aws_iam_policy.cloudscan.arn
 }
 
 resource "aws_iam_policy" "cloudscan" {
@@ -71,7 +80,7 @@ resource "aws_iam_policy" "cloudscan" {
   description = "CloudScan Policy for Operations."
 
   policy = <<EOF
-  {
+{
       "Version": "2012-10-17",
       "Statement": [
           {
@@ -108,6 +117,11 @@ resource "aws_iam_policy" "cloudscan" {
               "Resource": "*"
           }
       ]
-  }
+}
 EOF
+}
+
+resource "aws_iam_instance_profile" "CloudScanInstanceProfile" {
+  name = "CloudScanInstanceProfile"
+  role = aws_iam_role.CloudScanInstanceRole.name
 }
