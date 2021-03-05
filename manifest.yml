@@ -27,6 +27,9 @@ data:
         "us-east-1",
         "us-east-2"
       ],
+
+      "encryptionkey": "someencryptionkey",
+
       "routingkey":"pagerdutyroutingkey"
 
     }

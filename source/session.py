@@ -1,5 +1,13 @@
-import boto3, glog
+import boto3,logging, json_logging, sys
 from botocore.exceptions import ClientError
+
+# log is initialized without a web framework name
+json_logging.ENABLE_JSON_LOGGING = True
+json_logging.init_non_web()
+
+log = logging.getLogger(__name__)
+log.setLevel(logging.DEBUG)
+log.addHandler(logging.StreamHandler(sys.stdout))
 
 def client_tech(tech,region,tokens):
     client = boto3.client(tech,
@@ -34,8 +42,8 @@ def assume_role(account,role):
         newsession_id = sts_response["Credentials"]["AccessKeyId"]
         newsession_key = sts_response["Credentials"]["SecretAccessKey"]
         newsession_token = sts_response["Credentials"]["SessionToken"]
-        glog.info("[*] Assumed Role: " + arn)
+        log.info("[*] Assumed Role: " + arn)
         return newsession_id,newsession_key,newsession_token
     except ClientError as e:
-        glog.error("Account= " + account + " Could not be assumed by Tool! Error: " + str(e))
+        log.error("Account= " + account + " Could not be assumed by Tool! Error: " + str(e))
         return None
