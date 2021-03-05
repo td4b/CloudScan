@@ -1,6 +1,16 @@
-import boto3, pickle, redis, json, glog
+import boto3, pickle, redis, json, logging, json_logging, sys
 from botocore.exceptions import ClientError
 from session import assume_role, s3_session
+
+from crypt import encrypt, decrypt
+
+# log is initialized without a web framework name
+json_logging.ENABLE_JSON_LOGGING = True
+json_logging.init_non_web()
+
+log = logging.getLogger(__name__)
+log.setLevel(logging.DEBUG)
+log.addHandler(logging.StreamHandler(sys.stdout))
 
 class S3Auditor:
 
@@ -29,25 +39,25 @@ class S3Auditor:
                 }
         try:
             result = client.get_bucket_acl(Bucket=name)
-            glog.info("[*] Got bucket ACL for Bucket: " + name)
+            log.info("[*] Got bucket ACL for Bucket: " + name)
             if result['Owner']['ID'] not in self.cannonicals:
                 self.cannonicals.append(result['Owner']['ID'])
             # Also check on the ACL if the bucket is Public.
             uri = [uri for uri in [policy['URI'] for policy in [item['Grantee'] for item in result['Grants']] if policy['Type'] == 'Group'] if uri == 'http://acs.amazonaws.com/groups/global/AllUsers']
             if len(uri) >= 1:
-                glog.info("[*] Public Bucket ACL found for Bucket: " + name)
+                log.info("[*] Public Bucket ACL found for Bucket: " + name)
                 return add_item(result,True)
             try:
                 # Checks Public Policy if
                 check_pub = client.get_bucket_policy_status(Bucket=name)['PolicyStatus']['IsPublic']
-                glog.info("[*] Got bucket Policy for Bucket: " + name)
+                log.info("[*] Got bucket Policy for Bucket: " + name)
                 # Populate Cannonical IDs.
                 return add_item(result,check_pub)
             except Exception as e:
-                glog.info("Unexpected error: %s" % e + " Cannot get Bucket Policy: " + name + " Marking Public as False.")
+                log.info("Unexpected error: %s" % e + " Cannot get Bucket Policy: " + name + " Marking Public as False.")
                 return add_item(result,False)
         except Exception as e:
-            glog.info("Unexpected error: %s" % e + " Cannot get Bucket ACL: " + name)
+            log.info("Unexpected error: %s" % e + " Cannot get Bucket ACL: " + name)
 
     def s3_inspect(self,dic,client,account):
         bucket_list = client.list_buckets()
@@ -64,16 +74,14 @@ class S3Auditor:
 
     def run(self):
         for account in self.accounts:
-            glog.info("[*] Checking Buckets in account: " + account)
+            log.info("[*] Checking Buckets in account: " + account)
             self.call_sts(self.data,account)
 
-        glog.info("[*] Completed Collecting S3 Data.")
-        glog.info("[*] Sending S3 Data to Redis.")
+        log.info("[*] Completed Collecting S3 Data.")
+        log.info("[*] Sending S3 Data to Redis.")
 
         # Dump s3 Metadata into Redis.
-        dumped = pickle.dumps(self.data)
-        self.cn_redis.set("s3auditor", dumped)
+        self.cn_redis.set("s3auditor", encrypt(self.data))
 
         # Dump the cannonical IDs into redis.
-        dumped = pickle.dumps(self.cannonicals)
-        self.cn_redis.set("cannonicals", dumped)
+        self.cn_redis.set("cannonicals", encrypt(self.cannonicals))

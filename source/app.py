@@ -1,5 +1,7 @@
 from flask import Flask, make_response, render_template
-import redis, pickle
+import redis
+
+from crypt import encrypt, decrypt
 
 application = Flask(__name__)
 
@@ -13,7 +15,7 @@ def ipinfo():
     # ipauditor status
     r = redis.Redis(host='redis', port=6379, db=0)
     try:
-        json = pickle.loads(r.get('ipauditor'))
+        json = decrypt(r.get('ipauditor'))
         return json
     except TypeError:
         response = make_response("No Data Populated Yet...",200)
@@ -24,7 +26,7 @@ def s3info():
     # ipauditor status
     r = redis.Redis(host='redis', port=6379, db=0)
     try:
-        json = pickle.loads(r.get('s3auditor'))
+        json = decrypt(r.get('s3auditor'))
         return json
     except TypeError:
         response = make_response("No Data Populated Yet...",200)
