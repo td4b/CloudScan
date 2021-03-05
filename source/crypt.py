@@ -13,7 +13,7 @@ log.setLevel(logging.DEBUG)
 log.addHandler(logging.StreamHandler(sys.stdout))
 
 with open("config.json") as f:
-    cryptkey = json.load(f)["encryptionkey"]
+    shared_key = json.load(f)["encryptionkey"]
 
 def encrypt(objects):
     blob = pickle.dumps(objects)
