@@ -42,6 +42,9 @@ func main() {
 		log.Fatalf("Failed to load configuration: %v", err)
 	}
 
+	// Check health status of cluster, if it is not health exit after 10 seconds to retry.
+	elastics.Healthcheck()
+
 	// Run indefinitely
 	for {
 		// Log the start of the cycle
@@ -49,11 +52,10 @@ func main() {
 
 		// Start the Domain record enumeration
 		// Start the Domain record enumeration
-		targets := dns.FindRecords(config.Settings.Targets)
-		records := dns.FindRecords(targets)
+		records := dns.FindRecords(config.Settings.Targets)
 		gologger.Info().Msg("Finished Domains record scans.")
-		elastics.RecordUpload("domains-records", records)
 
+		elastics.RecordUpload("domains-records", records)
 		// Start the vulnerability scans
 		gologger.Info().Msg("Starting vulnerability scans with Nuclei SDK.")
 		results := scanner.Scan(records)

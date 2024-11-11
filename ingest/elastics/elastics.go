@@ -16,6 +16,68 @@ import (
 	"github.com/projectdiscovery/gologger"
 )
 
+func Healthcheck() {
+	// Elasticsearch host and credentials
+	host := os.Getenv("ELASTIC_HOST")
+	if host == "" {
+		host = "localhost"
+	}
+	username := "elastic"
+	password := "elastic"
+
+	// Elasticsearch client configuration
+	cfg := elastic.Config{
+		Addresses: []string{
+			fmt.Sprintf("https://%s:9200", host),
+		},
+		Username: username,
+		Password: password,
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true, // Skips TLS certificate verification
+			},
+		},
+	}
+
+	es, err := elastic.NewClient(cfg)
+	if err != nil {
+		gologger.Fatal().Msg(fmt.Sprintf("Error creating Elasticsearch client: %s", err))
+		os.Exit(1)
+	}
+
+	// Request cluster health
+	res, err := es.Cluster.Health()
+	if err != nil {
+		gologger.Error().Msg(fmt.Sprintf("Error getting cluster health: %s", err))
+		time.Sleep(10 * time.Second)
+		os.Exit(1)
+	}
+	defer res.Body.Close()
+
+	if res.IsError() {
+		gologger.Error().Msg(fmt.Sprintf("Cluster health check failed with status: %s", res.Status()))
+		time.Sleep(10 * time.Second)
+		os.Exit(1)
+	}
+
+	// Parse the response body
+	var health map[string]interface{}
+	if err := json.NewDecoder(res.Body).Decode(&health); err != nil {
+		gologger.Error().Msg(fmt.Sprintf("Error parsing cluster health response: %s", err))
+		time.Sleep(10 * time.Second)
+		os.Exit(1)
+	}
+
+	// Check cluster status
+	if status, ok := health["status"].(string); ok && (status == "green" || status == "yellow") {
+		gologger.Info().Msg("Elasticsearch cluster is ready.")
+	} else {
+		gologger.Error().Msg("Elasticsearch cluster is not ready. Status: " + health["status"].(string))
+		time.Sleep(10 * time.Second)
+		os.Exit(1)
+	}
+}
+
 func RecordUpload(index string, records []string) {
 	// Elasticsearch host and credentials
 	host := os.Getenv("ELASTIC_HOST")
