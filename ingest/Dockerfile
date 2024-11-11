@@ -24,6 +24,7 @@ RUN addgroup -S cloudscan && adduser -S cloudscan -G cloudscan
 
 # Create a home directory for the user and the necessary config directory
 RUN mkdir -p /home/cloudscan/.config/subfinder
+RUN mkdir -p /home/cloudscan/.config/cloudscan
 RUN mkdir -p /home/cloudscan/app
 
 # Set ownership of the home directory
