@@ -14,7 +14,7 @@ RUN go mod download
 COPY . .
 
 # Build the Go app
-RUN go build -o main .
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o main .
 
 # Use a minimal base image for the final output
 FROM alpine:latest
@@ -32,6 +32,10 @@ RUN chown -R cloudscan:cloudscan /home/cloudscan
 # Copy the binary from the builder image
 COPY --from=builder /app/main /home/cloudscan/app/main
 
+RUN chmod +x /home/cloudscan/app/main
+
+RUN chown cloudscan:cloudscan /home/cloudscan/app/main
+
 # Switch to the non-root user
 USER cloudscan
 
@@ -39,4 +43,4 @@ USER cloudscan
 WORKDIR /home/cloudscan
 
 # Command to run the executable
-CMD ["/app/main"]
+CMD ["/home/cloudscan/app/main"]

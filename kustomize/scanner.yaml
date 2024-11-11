@@ -21,7 +21,7 @@ data:
   config.toml: |
     # Example configuration settings
     [settings]
-    targets = ["target.com"]
+    targets = [""]
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -40,7 +40,7 @@ spec:
     spec:
       containers:
         - name: cloudscan
-          image: tdub17/cloudscan:latest
+          image: tdub17/cloudscan@sha256:396c3e7f2450c0ceb057f573bbd6eb23c3d6e0390a192d6dbc543137a5611a88
           env:
             - name: ELASTIC_HOST
               value: "elasticsearch-master"  # Set the value for ELASTIC_HOST here
