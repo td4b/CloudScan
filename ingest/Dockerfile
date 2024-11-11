@@ -19,11 +19,24 @@ RUN go build -o main .
 # Use a minimal base image for the final output
 FROM alpine:latest
 
-# Set the working directory in the new image
-WORKDIR /app
+# Create a non-root user and group
+RUN addgroup -S cloudscan && adduser -S cloudscan -G cloudscan
+
+# Create a home directory for the user and the necessary config directory
+RUN mkdir -p /home/cloudscan/.config/subfinder
+RUN mkdir -p /home/cloudscan/app
+
+# Set ownership of the home directory
+RUN chown -R cloudscan:cloudscan /home/appuser
 
 # Copy the binary from the builder image
-COPY --from=builder /app/main .
+COPY --from=builder /app/main /home/cloudscan/app/main
+
+# Switch to the non-root user
+USER cloudscan
+
+# Set the working directory to the non-root user's home directory
+WORKDIR /home/cloudscan
 
 # Command to run the executable
-CMD ["./main"]
+CMD ["/home/cloudscan/app/main"]
