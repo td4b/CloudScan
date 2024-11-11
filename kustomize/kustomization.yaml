@@ -1,0 +1,10 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - secret.yaml               
+  - configmaps.yaml 
+  - dashboards.yaml
+  - fluxcd-repositories.yaml  
+  - helmreleases.yaml
+  - scanner.yaml     
+ 

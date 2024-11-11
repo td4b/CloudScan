@@ -39,4 +39,4 @@ USER cloudscan
 WORKDIR /home/cloudscan
 
 # Command to run the executable
-CMD ["/home/cloudscan/app/main"]
+CMD ["/app/main"]

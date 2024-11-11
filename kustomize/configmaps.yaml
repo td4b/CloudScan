@@ -1,0 +1,73 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: elastic-values
+  namespace: monitoring
+data:
+  values.yaml: |
+    replicas: 1
+    minimumMasterNodes: 1
+
+    # https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-health.html#request-params wait_for_status
+    clusterHealthCheckParams: "wait_for_status=yellow&timeout=1s"
+
+    extraEnvs:
+      - name: ELASTIC_USERNAME
+        valueFrom:
+          secretKeyRef:
+            name: elastic-credentials
+            key: username
+      - name: ELASTIC_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: elastic-credentials
+            key: password
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: loki-values
+  namespace: monitoring
+data:
+  values.yaml: |
+    datasources:
+      datasources.yaml:
+        apiVersion: 1
+        datasources:
+          - name: Elasticsearch
+            type: elasticsearch
+            url: https://elasticsearch-master:9200
+            access: proxy
+            basicAuth: true
+            basicAuthUser: "elastic"          # Set the username
+            secureJsonData:
+              basicAuthPassword: "elastic"    # Set the password
+            jsonData:
+              tlsSkipVerify: true             # Skip TLS verification
+              esVersion: 7                    # Elasticsearch version (adjust if needed)
+              timeField: "@timestamp"         # Default timestamp field for Elasticsearch
+              index: "domains-*"              # Set the index pattern
+
+    dashboardProviders:
+      dashboardproviders.yaml:
+        apiVersion: 1
+        providers:
+          - name: 'External Scans'
+            orgId: 1
+            folder: ''
+            type: file
+            disableDeletion: false
+            editable: true
+            updateIntervalSeconds: 10
+            options:
+              path: /var/lib/grafana/dashboards
+              foldersFromFilesStructure: true
+
+    extraConfigmapMounts: 
+      - name: external-scan
+        mountPath: /var/lib/grafana/dashboards
+        subPath: ""
+        configMap: external-scan
+        readOnly: true
+        optional: false
