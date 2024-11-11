@@ -58,3 +58,4 @@ spec:
         - name: cloudscan-config-volume
           configMap:
             name: cloudscan-config
+            
