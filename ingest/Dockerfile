@@ -27,7 +27,7 @@ RUN mkdir -p /home/cloudscan/.config/subfinder
 RUN mkdir -p /home/cloudscan/app
 
 # Set ownership of the home directory
-RUN chown -R cloudscan:cloudscan /home/appuser
+RUN chown -R cloudscan:cloudscan /home/cloudscan
 
 # Copy the binary from the builder image
 COPY --from=builder /app/main /home/cloudscan/app/main
