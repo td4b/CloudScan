@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: external-scan
+  namespace: monitoring
+data:
+  dashboard.json: |
+    {{ (.Files.Get "dashboards/dashboard.json") | indent 4 }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: elastic-credentials
+  namespace: monitoring
+type: Opaque
+data:
+  username: ZWxhc3RpYwo=
+  password: ZWxhc3RpYwo=
+---
+apiVersion: helm.sh/v1
+kind: HelmRelease
+metadata:
+  name: elasticsearch
+  namespace: monitoring
+spec:
+  chart:
+    repository: https://helm.elastic.co
+    name: elasticsearch
+  values:
+    - elasticvalues.yml  # Reference the values file for Elasticsearch configuration
+---
+apiVersion: helm.sh/v1
+kind: HelmRelease
+metadata:
+  name: loki-stack
+  namespace: monitoring
+spec:
+  chart:
+    repository: https://grafana.github.io/helm-charts
+    name: loki-stack
+  values:
+    - lokivalues.yml  # Reference the values file for Loki stack configuration
