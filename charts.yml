@@ -11,6 +11,17 @@ data:
     shodan:
       - "your-api-key"
 ---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cloudscan-config
+  namespace: monitoring
+data:
+  config.toml: |
+    # Example configuration settings
+    [settings]
+    targets = ["mytarget.com"]
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -29,14 +40,23 @@ spec:
       containers:
         - name: cloudscan
           image: tdub17/cloudscan:latest
+          env:
+            - name: ELASTIC_HOST
+              value: "elasticsearch-master"  # Set the value for ELASTIC_HOST here
           volumeMounts:
             - name: config-volume
               mountPath: /home/cloudscan/.config/subfinder/provider-config.yaml
               subPath: provider-config.yaml
+            - name: cloudscan-config-volume
+              mountPath: /home/cloudscan/app/config.toml
+              subPath: config.toml
       volumes:
         - name: config-volume
           configMap:
             name: subfinder-config
+        - name: cloudscan-config-volume
+          configMap:
+            name: cloudscan-config
 ---
 apiVersion: v1
 kind: ConfigMap

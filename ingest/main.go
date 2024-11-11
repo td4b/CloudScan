@@ -4,12 +4,29 @@ import (
 	"cloudscan/dns"
 	"cloudscan/elastics"
 	"cloudscan/scanner"
+	"log"
 	"time"
 
+	"github.com/BurntSushi/toml"
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/gologger/formatter"
 	"github.com/projectdiscovery/gologger/levels"
 )
+
+// Config holds the target hosts from the config.toml file
+type Config struct {
+	Settings struct {
+		Targets []string `toml:"targets"`
+	} `toml:"settings"`
+}
+
+func loadConfig(configPath string) (*Config, error) {
+	var config Config
+	if _, err := toml.DecodeFile(configPath, &config); err != nil {
+		return nil, err
+	}
+	return &config, nil
+}
 
 func main() {
 	// Set the maximum log level to Verbose
@@ -19,13 +36,20 @@ func main() {
 	// Use a JSON formatter for structured logging
 	gologger.DefaultLogger.SetFormatter(&formatter.JSON{})
 
+	// Load configuration from config.toml
+	config, err := loadConfig("config.toml")
+	if err != nil {
+		log.Fatalf("Failed to load configuration: %v", err)
+	}
+
 	// Run indefinitely
 	for {
 		// Log the start of the cycle
 		gologger.Info().Msg("Starting scan of Domains records.")
 
 		// Start the Domain record enumeration
-		targets := []string{"mydomain.com"}
+		// Start the Domain record enumeration
+		targets := dns.FindRecords(config.Settings.Targets)
 		records := dns.FindRecords(targets)
 		gologger.Info().Msg("Finished Domains record scans.")
 		elastics.RecordUpload("domains-records", records)

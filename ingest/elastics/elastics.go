@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
@@ -17,7 +18,10 @@ import (
 
 func RecordUpload(index string, records []string) {
 	// Elasticsearch host and credentials
-	host := "localhost"
+	host := os.Getenv("ELASTIC_HOST")
+	if host == "" {
+		host = "localhost"
+	}
 	username := "elastic"
 	password := "elastic"
 
