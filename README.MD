@@ -1,6 +1,6 @@
 
 <div align="center">
-<img src="https://github.com/collectivehealth/CloudScan/blob/master/icon.png" width="40%">
+<img src="https://github.com/td4b/CloudScan/blob/master/icon.png" width="40%">
 </div>
 
 ## Description
