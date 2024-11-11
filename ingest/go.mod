@@ -3,6 +3,7 @@ module cloudscan
 go 1.21.0
 
 require (
+	github.com/BurntSushi/toml v0.3.1
 	github.com/elastic/go-elasticsearch/v8 v8.15.0
 	github.com/projectdiscovery/gologger v1.1.27
 	github.com/projectdiscovery/nuclei/v3 v3.3.5
