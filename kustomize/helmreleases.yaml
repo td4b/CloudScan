@@ -4,7 +4,7 @@ metadata:
   name: loki-stack
   namespace: monitoring
 spec:
-  releaseName: loki-stack
+  releaseName: grafana
   interval: 1m
   chart:
     spec:
@@ -16,7 +16,7 @@ spec:
       version: "8.6.0"
   valuesFrom:
     - kind: ConfigMap
-      name: loki-values
+      name: grafana-values
       valuesKey: values.yaml
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2

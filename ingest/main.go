@@ -31,7 +31,7 @@ func loadConfig(configPath string) (*Config, error) {
 func main() {
 	// Set the maximum log level to Verbose
 	// levels.LevelVerbose for debugging.
-	gologger.DefaultLogger.SetMaxLevel(levels.LevelInfo)
+	gologger.DefaultLogger.SetMaxLevel(levels.LevelVerbose)
 
 	// Use a JSON formatter for structured logging
 	gologger.DefaultLogger.SetFormatter(&formatter.JSON{})

@@ -27,7 +27,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: loki-values
+  name: grafana-values
   namespace: monitoring
 data:
   values.yaml: |

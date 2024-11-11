@@ -23,3 +23,9 @@ Install kustomize if you do not have it already, then deploy the helm charts/ ma
 cd kustomize
 kustomize build . | kubectl apply -f -
 ```
+
+Get the grafana secret to login/ view dashboards.
+
+```bash
+kubectl get secret --namespace monitoring grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
+```
