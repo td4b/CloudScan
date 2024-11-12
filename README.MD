@@ -58,5 +58,5 @@ You should be able to view the dashboard for Grafana via port forwarding the gra
 `kubectl port-forward grafana-6647577557-cbzks 3000:3000 -n monitoring`
 
 <div align="center">
-<img src="https://github.com/td4b/CloudScan/blob/master/dashboard.png" width="40%">
+<img src="https://github.com/td4b/CloudScan/blob/master/dashboard.png" width="80%">
 </div>
