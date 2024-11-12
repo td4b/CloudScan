@@ -38,12 +38,21 @@ spec:
       labels:
         app: cloudscan
     spec:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       containers:
         - name: cloudscan
           image: tdub17/cloudscan:latest
+          resources:
+            requests:
+              cpu: 2
+              memory: 4Gi
+            limits:
+              cpu: 4
+              memory: 8Gi
           env:
             - name: ELASTIC_HOST
-              value: "elasticsearch-master"  # Set the value for ELASTIC_HOST here
+              value: "elasticsearch-master.monitoring.svc.cluster.local"  # use the FQDN due to host networking needs.
           volumeMounts:
             - name: config-volume
               mountPath: /home/cloudscan/.config/subfinder/provider-config.yaml
@@ -58,4 +67,4 @@ spec:
         - name: cloudscan-config-volume
           configMap:
             name: cloudscan-config
-            
+    

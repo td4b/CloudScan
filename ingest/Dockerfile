@@ -17,17 +17,19 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o main .
 
 # Use a minimal base image for the final output
-FROM alpine:latest
+FROM ubuntu:latest
 
-# Install Python, py3-virtualenv, and other dependencies
-RUN apk add --no-cache python3 py3-virtualenv
-
-# Install nuclei bind tools
-RUN apk upgrade --no-cache \
-    && apk add --no-cache bind-tools chromium ca-certificates
+# Update package list and install Python, virtualenv, and other dependencies
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-venv \
+    bind9-dnsutils \
+    chromium-browser \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 
 # Create a non-root user and group
-RUN addgroup -S cloudscan && adduser -S cloudscan -G cloudscan
+RUN groupadd -r cloudscan && useradd -r -g cloudscan cloudscan
 
 # Create a home directory for the user and the necessary config directory
 RUN mkdir -p /home/cloudscan/.config/subfinder \
@@ -41,6 +43,7 @@ RUN chown -R cloudscan:cloudscan /home/cloudscan
 # Copy the binary from the builder image
 COPY --from=builder /app/main /home/cloudscan/app/main
 
+# Set appropriate permissions
 RUN chmod +x /home/cloudscan/app/main
 RUN chown cloudscan:cloudscan /home/cloudscan/app/main
 
