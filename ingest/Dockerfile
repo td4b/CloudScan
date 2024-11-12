@@ -22,6 +22,10 @@ FROM alpine:latest
 # Install Python, py3-virtualenv, and other dependencies
 RUN apk add --no-cache python3 py3-virtualenv
 
+# Install nuclei bind tools
+RUN apk upgrade --no-cache \
+    && apk add --no-cache bind-tools chromium ca-certificates
+
 # Create a non-root user and group
 RUN addgroup -S cloudscan && adduser -S cloudscan -G cloudscan
 

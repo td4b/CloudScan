@@ -16,8 +16,8 @@ import (
 	"github.com/projectdiscovery/gologger"
 )
 
-func Healthcheck() {
-	// Elasticsearch host and credentials
+// Initialize default Elasticsearch configuration
+var cfg = func() elastic.Config {
 	host := os.Getenv("ELASTIC_HOST")
 	if host == "" {
 		host = "localhost"
@@ -25,8 +25,7 @@ func Healthcheck() {
 	username := "elastic"
 	password := "elastic"
 
-	// Elasticsearch client configuration
-	cfg := elastic.Config{
+	return elastic.Config{
 		Addresses: []string{
 			fmt.Sprintf("https://%s:9200", host),
 		},
@@ -38,6 +37,9 @@ func Healthcheck() {
 			},
 		},
 	}
+}()
+
+func Healthcheck() {
 
 	es, err := elastic.NewClient(cfg)
 	if err != nil {
@@ -79,27 +81,6 @@ func Healthcheck() {
 }
 
 func RecordUpload(index string, records []string) {
-	// Elasticsearch host and credentials
-	host := os.Getenv("ELASTIC_HOST")
-	if host == "" {
-		host = "localhost"
-	}
-	username := "elastic"
-	password := "elastic"
-
-	// Elasticsearch client configuration
-	cfg := elastic.Config{
-		Addresses: []string{
-			fmt.Sprintf("https://%s:9200", host),
-		},
-		Username: username,
-		Password: password,
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: true, // Skips TLS certificate verification
-			},
-		},
-	}
 
 	es, err := elastic.NewClient(cfg)
 	if err != nil {
