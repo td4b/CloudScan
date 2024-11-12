@@ -1,3 +1,3 @@
 # config.toml
 [settings]
-targets = ["mytarget.com"]
+targets = ["domain.com"]

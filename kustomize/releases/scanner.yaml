@@ -21,7 +21,7 @@ data:
   config.toml: |
     # Example configuration settings
     [settings]
-    targets = ["targets.com"]
+    targets = ["domain.com"]
 ---
 apiVersion: apps/v1
 kind: Deployment
