@@ -13,12 +13,11 @@ data:
     clusterHealthCheckParams: "wait_for_status=yellow&timeout=1s"
 
     service:
-      type: NodePort
+      type: LoadBalancer
       ports:
-        http:
-          nodePort: 30092  # Change this to your preferred NodePort within the 30000-32767 range
-          port: 9200       # The port on which Elasticsearch listens internally
-          targetPort: 9200 # The port to route to within the pod
+        - name: http
+          protocol: TCP
+          targetPort: 9200    # The port to route to within the pod
 
     extraEnvs:
       - name: ELASTIC_USERNAME
