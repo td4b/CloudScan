@@ -27,7 +27,7 @@ var cfg = func() elastic.Config {
 
 	return elastic.Config{
 		Addresses: []string{
-			fmt.Sprintf("https://%s:9200", host),
+			fmt.Sprintf("https://%s:30092", host),
 		},
 		Username: username,
 		Password: password,
