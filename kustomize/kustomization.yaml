@@ -6,5 +6,5 @@ resources:
   - configmaps/dashboards.yaml
   - repositories/fluxcd-repositories.yaml  
   - releases/helmreleases.yaml
-  - releases/scanner.yaml     
+  #- releases/scanner.yaml     
  
