@@ -37,28 +37,34 @@ spec:
       labels:
         app: cloudscan
     spec:
+      hostPID: true
+      hostIPC: true
       hostNetwork: true
       securityContext:
-            privileged: true
+        runAsUser: 0
+        runAsGroup: 0
+        fsGroup: 0
       containers:
         - name: cloudscan
           image: tdub17/cloudscan:latest
+          securityContext:
+            privileged: true
           resources:
             requests:
-              cpu: 2
-              memory: 4Gi
+              cpu: 4
+              memory: 10Gi
             limits:
               cpu: 4
-              memory: 8Gi
+              memory: 12Gi
           # env:
           #   - name: ELASTIC_HOST
           #     value: "elasticsearch-master.monitoring.svc.cluster.local"  # use the FQDN due to host networking needs.
           volumeMounts:
             - name: config-volume
-              mountPath: /home/cloudscan/.config/subfinder/provider-config.yaml
+              mountPath: /home/root/.config/subfinder/provider-config.yaml
               subPath: provider-config.yaml
             - name: cloudscan-config-volume
-              mountPath: /home/cloudscan/.config/cloudscan/config.toml
+              mountPath: /home/root/.config/cloudscan/config.toml
               subPath: config.toml
       volumes:
         - name: config-volume
