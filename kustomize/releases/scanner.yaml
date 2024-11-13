@@ -20,7 +20,7 @@ data:
   config.toml: |
     # Example configuration settings
     [settings]
-    targets = ["domain.com"]
+    targets = [""]
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -40,10 +40,6 @@ spec:
       hostPID: true
       hostIPC: true
       hostNetwork: true
-      securityContext:
-        runAsUser: 0
-        runAsGroup: 0
-        fsGroup: 0
       containers:
         - name: cloudscan
           image: tdub17/cloudscan:latest

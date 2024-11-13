@@ -37,7 +37,7 @@ func main() {
 	gologger.DefaultLogger.SetFormatter(&formatter.JSON{})
 
 	// Load configuration from config.toml
-	config, err := loadConfig("/home/root/.config/cloudscan/config.toml")
+	config, err := loadConfig("config.toml")
 	if err != nil {
 		log.Fatalf("Failed to load configuration: %v", err)
 	}
