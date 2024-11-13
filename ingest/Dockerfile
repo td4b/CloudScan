@@ -22,40 +22,24 @@ FROM ubuntu:latest
 # Update package list and install Python, virtualenv, and other dependencies
 RUN apt-get update && apt-get install -y \
     python3 \
-    python3-venv \
     bind9-dnsutils \
     chromium-browser \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# Create a non-root user and group
-RUN groupadd -r cloudscan && useradd -r -g cloudscan cloudscan
-
 # Create a home directory for the user and the necessary config directory
-RUN mkdir -p /home/cloudscan/.config/subfinder \
-             /home/cloudscan/.config/cloudscan \
-             /home/cloudscan/app \
-             /home/cloudscan/venv
-
-# Set ownership of the home directory
-RUN chown -R cloudscan:cloudscan /home/cloudscan
+RUN mkdir -p /home/root/.config/subfinder \
+             /home/root/.config/cloudscan \
+             /home/root/app 
 
 # Copy the binary from the builder image
-COPY --from=builder /app/main /home/cloudscan/app/main
+COPY --from=builder /app/main /home/root/app/main
 
 # Set appropriate permissions
-RUN chmod +x /home/cloudscan/app/main
-RUN chown cloudscan:cloudscan /home/cloudscan/app/main
+RUN chmod +x /home/root/app/main
 
-# Switch to the non-root user
-USER cloudscan
-
-# Set the working directory to the non-root user's home directory
-WORKDIR /home/cloudscan
-
-# Create and activate the Python virtual environment
-RUN python3 -m venv /home/cloudscan/.venv
-ENV PATH="/home/cloudscan/.venv/bin:$PATH"
+# Set the working directory to the root user's home directory
+WORKDIR /home/root
 
 # Command to activate the virtual environment and run the Go binary
-CMD ["/bin/sh", "-c", ". /home/cloudscan/.venv/bin/activate && /home/cloudscan/app/main"]
+CMD ["/home/root/app/main"]
