@@ -1,0 +1,25 @@
+{
+  "packages": [
+    "k3d@5.7.4",
+    "kubectl@1.31.2",
+    "k9s@0.32.5",
+    "kustomize@5.5.0",
+    "go@1.23.3"
+  ],
+  "shell": {
+    "init_hook": [
+      "curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3",
+      "chmod 700 get_helm.sh",
+      "./get_helm.sh",
+      "export PATH=$PATH:/usr/local/go/bin",
+      "export GO111MODULE=on",
+      "export KUBECONFIG=$HOME/.kube/config",
+      "cd scripts/",
+      "./create.sh"
+    ],
+    "env": {
+      "DEVBOX_PROJECT_NAME": "k3d-golang-dev"
+    }
+  },
+  "description": "Devbox shell for K3d, Go development, Kubernetes monitoring with K9s, and virtualization with Vagrant and VirtualBox."
+}
