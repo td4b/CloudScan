@@ -7,12 +7,9 @@ Vagrant.configure("2") do |config|
 
   # Configure a new network adapter for our VM.
   config.vm.network "private_network", type: "dhcp"
-  
-  # Provision a file to the VM
-  config.vm.provision "file", source: "./web_server.py", destination: "/home/vagrant/web_server.py"
 
-  # Sync host directory (Updated for VMware Fusion)
-  config.vm.synced_folder "../", "/mnt/host", type: "nfs", nfs_udp: false, nfs_version: 3
+  # Copy all the project folders to the VM.
+  config.vm.provision "file", source: "./Project", destination: "/home/vagrant/CloudScan"
 
   # Configure resources for VMware Fusion
   config.vm.provider "vmware_fusion" do |vf|
@@ -48,11 +45,5 @@ Vagrant.configure("2") do |config|
 
     # Install Nix if it is missing.
     yes "" | devbox shell
-
-    # Bring up all interfaces and start services
-    nohup python3 /home/vagrant/web_server.py 10.30.24.2 &
-    nohup python3 /home/vagrant/web_server.py 10.30.24.3 &
-    nohup python3 /home/vagrant/web_server.py 10.30.24.4 &
-    nohup python3 /home/vagrant/web_server.py 10.30.24.5 &
   SHELL
 end
