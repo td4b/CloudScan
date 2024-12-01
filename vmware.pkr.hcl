@@ -71,4 +71,6 @@ build {
     source      = "./Project/agent/main"
     destination = "/home/ubuntu/agent/main"
   }
+
+  
 }
