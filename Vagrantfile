@@ -5,11 +5,8 @@ Vagrant.configure("2") do |config|
   # Use a public network (bridged mode)
   config.vm.network "public_network", bridge: "en0: Wi-Fi" # Replace with your network adapter name
 
-  # Configure a new network adapter for our VM.
-  config.vm.network "private_network", type: "dhcp"
-
   # Copy all the project folders to the VM.
-  config.vm.provision "file", source: "./Project", destination: "/home/vagrant/CloudScan"
+  config.vm.synced_folder "./Project", "/home/vagrant/CloudScan", type: "nfs", mount_options: ["tcp"]
 
   # Configure resources for VMware Fusion
   config.vm.provider "vmware_fusion" do |vf|

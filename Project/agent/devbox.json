@@ -1,0 +1,16 @@
+{
+    "packages": [
+      "go@1.23.3"
+    ],
+    "shell": {
+      "init_hook": [
+        "export PATH=$PATH:/usr/local/go/bin",
+        "export GO111MODULE=on"
+      ],
+      "env": {
+        "DEVBOX_PROJECT_NAME": "golang-dev"
+      }
+    },
+    "description": "Devbox shell for Go Daemon Development."
+}
+  

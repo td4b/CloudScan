@@ -1,0 +1,35 @@
+#cloud-config
+autoinstall:
+  version: 1
+  # network:
+  #   version: 2
+  #   ethernets:
+  #     eth0:
+  #       dhcp4: true
+  early-commands:
+    - sudo systemctl stop ssh
+    - echo "cloudscan-agent" > /etc/hostname
+    - hostnamectl set-hostname cloudscan-agent
+  user-data:
+    users:
+    - default
+    - name: ubuntu
+      passwd: $2a$10$MTKU5o7nrALDfepeqNQ0rOZ3TG9QeOQ7kg4vJRjTHGsaga6KU7TqO
+      shell: /bin/bash
+      lock-passwd: false
+      sudo: ALL=(ALL) NOPASSWD:ALL
+      groups: users, admin
+      ssh_authorized_keys:
+        - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDTdVI5aVEDm1iCx7DNZlpIaZEk0qADrxt2IHo+hzQqhN20CuA4xxPQgk46cV8Z+axsxk7/dluY2HMOTIyB8BAbu5/p+LGEXWwr6zfKH66R0vA9nIsYzmdkrrSUnRUXFRGe53G5PpvXSMLv1i50BVCEdxcQjZmL00w1PPq88GEnhrUi432nbtsZc0yNtFc8vk54s/Zce/i/upKu6Uze0/euQGN1PTZBI0EA9eu3QOg0uSo040g/faU432vIRtIXZqR5c2gd3XT10U6tvrhzycyk8LLiLETpEFdxJAiNJ/y1KDGQ64VX7a3cpKkAx/WhCSxa5XkB6UZeM8EGTCGAXetr2MZk5H4HNqhutx0DqBj9YpytY1QucJ4XHfLfsZ8iSQrim3D/fMdusLuxnr9bHKrGOlLraFmHdxx27N0s0XfgqEF76NgiZofAd9r4nq1d6aO5Fshb5HFMsHS+Rehhz4vPBmZkwdr/WK6d/8n+1+R6aGGpeILXYcvhE4/B9nqKUZrap4o+qzwlb4eZs95SSPBlijS1BTO28qBtjRX7uwYcwbYxgleg+nE1dJqXC+tdCmKRczZhk/vmeP53Ibk/Zdqaj8crS21soe2xOikxpiIxhygqBR9MsdZnUDtrT/UI3bbaZPiTA+dYhMIMcp+11/vjdw/kEXIYAOI8GyEvs9KYTw== thomaswest@macbookpro.lan
+  packages: [open-vm-tools]
+  ssh:
+    install-server: true
+    authorized-keys:
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDTdVI5aVEDm1iCx7DNZlpIaZEk0qADrxt2IHo+hzQqhN20CuA4xxPQgk46cV8Z+axsxk7/dluY2HMOTIyB8BAbu5/p+LGEXWwr6zfKH66R0vA9nIsYzmdkrrSUnRUXFRGe53G5PpvXSMLv1i50BVCEdxcQjZmL00w1PPq88GEnhrUi432nbtsZc0yNtFc8vk54s/Zce/i/upKu6Uze0/euQGN1PTZBI0EA9eu3QOg0uSo040g/faU432vIRtIXZqR5c2gd3XT10U6tvrhzycyk8LLiLETpEFdxJAiNJ/y1KDGQ64VX7a3cpKkAx/WhCSxa5XkB6UZeM8EGTCGAXetr2MZk5H4HNqhutx0DqBj9YpytY1QucJ4XHfLfsZ8iSQrim3D/fMdusLuxnr9bHKrGOlLraFmHdxx27N0s0XfgqEF76NgiZofAd9r4nq1d6aO5Fshb5HFMsHS+Rehhz4vPBmZkwdr/WK6d/8n+1+R6aGGpeILXYcvhE4/B9nqKUZrap4o+qzwlb4eZs95SSPBlijS1BTO28qBtjRX7uwYcwbYxgleg+nE1dJqXC+tdCmKRczZhk/vmeP53Ibk/Zdqaj8crS21soe2xOikxpiIxhygqBR9MsdZnUDtrT/UI3bbaZPiTA+dYhMIMcp+11/vjdw/kEXIYAOI8GyEvs9KYTw== thomaswest@macbookpro.lan
+  ssh_pwauth: true
+  keyboard:
+    layout: us
+  locale: en_US
+  storage:
+    layout:
+      name: direct

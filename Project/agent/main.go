@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 	"log"
 	"net"
 	"os"
@@ -32,10 +33,55 @@ func setMemlockLimit() error {
 	return nil
 }
 
+func getPrimaryInterface() (*net.Interface, net.Addr, error) {
+	interfaces, err := net.Interfaces()
+	if err != nil {
+		return nil, nil, fmt.Errorf("error listing interfaces: %v", err)
+	}
+
+	for _, iface := range interfaces {
+		// Skip interfaces that are down or loopback
+		if iface.Flags&net.FlagUp == 0 || iface.Flags&net.FlagLoopback != 0 {
+			continue
+		}
+
+		addrs, err := iface.Addrs()
+		if err != nil {
+			log.Printf("Error getting addresses for interface %s: %v", iface.Name, err)
+			continue
+		}
+
+		// Check for an IP address
+		for _, addr := range addrs {
+			var ip net.IP
+
+			// Handle both IPv4 and IPv6 addresses
+			switch v := addr.(type) {
+			case *net.IPNet:
+				ip = v.IP
+			case *net.IPAddr:
+				ip = v.IP
+			}
+
+			// Ensure the IP is not nil, and skip IPv6 link-local addresses
+			if ip != nil && !ip.IsLoopback() && ip.To4() != nil {
+				return &iface, addr, nil
+			}
+		}
+	}
+
+	return nil, nil, fmt.Errorf("no suitable network interface found")
+}
+
 func main() {
 	// Set memory lock limit
 	if err := setMemlockLimit(); err != nil {
 		log.Fatalf("Failed to set MEMLOCK limit: %v", err)
+	}
+
+	iface, _, err := getPrimaryInterface()
+	if err != nil {
+		log.Fatalf("Error: %v", err)
 	}
 
 	logger := log.New(os.Stdout, "ARPAgent: ", log.LstdFlags)
@@ -54,12 +100,6 @@ func main() {
 		logger.Fatalf("Error creating eBPF collection: %v", err)
 	}
 	defer coll.Close()
-
-	// Get the network interface
-	iface, err := net.InterfaceByName("enp0s8") // Replace with your interface name
-	if err != nil {
-		logger.Fatalf("Error getting interface: %v", err)
-	}
 
 	// Attach the eBPF program
 	logger.Printf("Attaching eBPF program to interface %s (index %d)...", iface.Name, iface.Index)
